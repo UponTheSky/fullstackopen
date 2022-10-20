@@ -3,16 +3,16 @@ import React from 'react';
 import { Part } from './Part'; 
 
 interface PropsType {
-  contents: {
+  parts: {
     part: string;
     exercises: number;
   }[];
 }
 
-export function Content({ contents }: PropsType) {
+export function Content({ parts }: PropsType) {
   return (
     <>
-      {contents.map(({ part, exercises }) => <Part part={part} exercise={exercises} />)}
+      {parts.map(({ part, exercises }) => <Part part={part} exercise={exercises} />)}
     </>
   );
 }

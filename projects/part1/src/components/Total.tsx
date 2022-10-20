@@ -1,9 +1,12 @@
 import React from 'react';
 
 interface PropsType {
-  totalNumber: number;
+  parts: {
+    part: string;
+    exercises: number;
+  }[];
 }
 
-export function Total({ totalNumber }: PropsType) {
-  return <p>Number of exercises {totalNumber}</p>
+export function Total({ parts }: PropsType) {
+  return <p>Number of exercises {parts.reduce((prev, { part, exercises }) => prev + exercises, 0)}</p>
 }
