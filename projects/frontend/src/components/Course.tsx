@@ -13,10 +13,13 @@ interface CourseProps {
 }
 
 export function Course({ course: { name, parts } }: CourseProps) {
+  const total = parts.reduce((prev, curr) => prev + curr.exercises, 0);
+
   return (
     <div>
       <Header name={name} />
       <Content parts={parts} />
+      <b>total of {total} exercises</b>
     </div>
   )  
 }
