@@ -1,6 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
 
 import { Course } from './components/Course';
 
@@ -30,4 +28,4 @@ const App = () => {
   return <Course course={course} />
 }
 
-export default App;
+export default App
