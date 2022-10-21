@@ -63,14 +63,36 @@ const App = () => {
     setPoints({...points, [selected]: points[selected] + 1});
   };
 
+  const getHighestVotedItem = () => {
+    let max_selected = 0;
+    let max_value = -1
+    for (const [key, value] of Object.entries(points)) {
+      if (value > max_value) {
+        max_value = value;
+        max_selected = Number(key);
+      }
+    }
+
+    return max_selected;
+  }
+
   return (
     <div>
-      {anecdotes[selected]}
+      <div>
+        <h1>Anecdotes of the day</h1>
+        {anecdotes[selected]}
+        <br />
+        has {points[selected]} votes
+        <br />
+        <Button text="next anecdote" onClickHandler={handleSelectItems} />
+        <Button text="vote" onClickHandler={handleVoteItems} />
+      </div>
+      <div>
+      <h1>Anecdotes with most votes</h1>
+      {anecdotes[getHighestVotedItem()]}
       <br />
-      has {points[selected]} votes
-      <br />
-      <Button text="next anecdote" onClickHandler={handleSelectItems} />
-      <Button text="vote" onClickHandler={handleVoteItems} />
+      has {points[getHighestVotedItem()]} votes
+      </div>
     </div>
   )
 };
