@@ -1,5 +1,5 @@
-export interface PartType {
+export interface PersonType {
   name: string;
-  exercises: number;
+  number: number;
   id: number;
 }
