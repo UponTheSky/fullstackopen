@@ -1,4 +1,6 @@
-import React, { useState, ChangeEventHandler, FormEventHandler } from 'react';
+import React, { useState, ChangeEventHandler, FormEventHandler, useEffect } from 'react';
+
+import axios from 'axios';
 
 import { PersonType } from './types';
 
@@ -13,6 +15,16 @@ const App = () => {
   const [newName, setNewName] = useState<PersonType['name']>('');
   const [newNumber, setNewNumber] = useState<PersonType['number']>(0);
   const [searchedName, setSearchedName] = useState('');
+
+  useEffect(() => {
+    const fetchPersons = async () => {
+      const fetchedData = await axios.get<Partial<PersonType>[]>('http://localhost:3001/persons');
+      const fetchedPersons = fetchedData.data;
+      setPersons(fetchedPersons);
+    };  
+
+    fetchPersons();
+  }, []);
 
   const handleNameInput: ChangeEventHandler<HTMLInputElement> = (event) => {
     setNewName(event.target.value);

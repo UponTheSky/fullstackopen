@@ -5,7 +5,7 @@ interface FilterProps {
   onChangeHandler: ChangeEventHandler<HTMLInputElement>;
 }
 
-export function Filter({ text, onChangeHandler }) {
+export function Filter({ text, onChangeHandler }: FilterProps) {
   return (
     <div>
       filter shown with: <input value={text} onChange={onChangeHandler} />
