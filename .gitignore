@@ -1,2 +1,2 @@
 # project node modules
-/projects/**/node_modules
+**/node_modules
