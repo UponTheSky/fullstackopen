@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { Button } from './components/Button';
-import { Stat } from './components/Stat';
+import { Statistics } from './components/Statistics';
 
 const App = () => {
   const [good, setGood] = useState(0)
@@ -13,8 +13,6 @@ const App = () => {
   const handleSetBad = () => { setBad(prev => prev + 1) };
 
   const getTotal = () => good + neutral + bad;
-  const getAverage = () => getTotal() / 3;
-  const getPositive = () => good / getTotal();
 
   return (
     <div>
@@ -26,12 +24,10 @@ const App = () => {
       </div>
       <div>
         <h1>statistics</h1>
-        <Stat text="good" stat={good} />
-        <Stat text="neutral" stat={neutral} />
-        <Stat text="bad" stat={bad} />
-        <Stat text="all" stat={getTotal()} />
-        <Stat text="average" stat={getAverage()} />
-        <Stat text="positive" stat={getPositive()} />
+        {getTotal() === 0 ?
+          "No feedback given" :
+          <Statistics good={good} neutral={neutral} bad={bad} />
+        }
       </div>
     </div>
   );

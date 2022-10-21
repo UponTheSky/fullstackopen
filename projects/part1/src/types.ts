@@ -5,7 +5,7 @@ export interface ButtonType<T> {
   onClickHandler: (arg: MouseEvent) => void;
 }
 
-export interface StatType {
+export interface StatisticsLineType {
   text: string;
-  stat: number;
+  value: number;
 }
