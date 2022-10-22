@@ -8,4 +8,17 @@ export interface CountryType {
   flags: { 
     png: string;
   }
+  capitalInfo: {
+    latlng: [number, number];
+  }
+}
+
+export interface WeatherType {
+  current: {
+    temp: number,
+    wind_speed: number,
+    weather: {
+      icon: string;
+    }
+  };
 }

@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-import { CountryType } from '../types';
+import { CountryType, WeatherType } from '../types';
+
+import { Weather } from './Weather';
 
 interface SingleCountryProps {
   country: CountryType;
@@ -13,9 +16,26 @@ export function SingleCountry(
       capital, 
       area, 
       languages, 
-      flags 
+      flags,
+      capitalInfo: {
+        latlng
+      }
     } 
   }: SingleCountryProps) {
+  const [weather, setWeather] = useState<WeatherType|null>(null);
+
+  useEffect(() => {
+    const fetchWeatherInfo = async () => {
+      const fetchedData = await axios.get<WeatherType>(`
+      https://api.openweathermap.org/data/3.0/onecall?lat=${latlng[0]}&lon=${latlng[1]}&exclude=minutely,hourly,daily,alerts&appid=${process.env.REACT_APP_API_KEY}
+      `)
+      setWeather(fetchedData.data);
+    };
+
+    fetchWeatherInfo();
+  }, []);
+
+ 
   return (
     <div>
       <h1>{name.common}</h1>
@@ -32,6 +52,7 @@ export function SingleCountry(
         ))}
       </ul>
       <img src={flags.png} />
+      {weather ? <Weather weather_={weather} /> : null}
     </div>
   );
 }
