@@ -1,73 +1,40 @@
-import React, { useState, ChangeEventHandler, FormEventHandler, useEffect } from 'react';
-
+import React, { useState, useEffect, ChangeEventHandler } from 'react';
 import axios from 'axios';
 
-import { PersonType } from './types';
+import { CountryType } from './types';
 
-import { Filter } from './components/Filter';
-import { PersonForm } from './components/PersonFrom';
-import { Persons } from './components/Persons';
+import { Search } from './components/Search';
+import { Result } from './components/Result';
 
 const App = () => {
-  const [persons, setPersons] = useState<Partial<PersonType>[]>([
-    { name: 'Arto Hellas' }
-  ]);
-  const [newName, setNewName] = useState<PersonType['name']>('');
-  const [newNumber, setNewNumber] = useState<PersonType['number']>(0);
-  const [searchedName, setSearchedName] = useState('');
+  const [countries, setCountries] = useState<CountryType[]>([]);
+  const [searchWord, setSearchWord] = useState('');
 
   useEffect(() => {
-    const fetchPersons = async () => {
-      const fetchedData = await axios.get<Partial<PersonType>[]>('http://localhost:3001/persons');
-      const fetchedPersons = fetchedData.data;
-      setPersons(fetchedPersons);
-    };  
+    const fetchAllCountries = async () => {
+      const fetchedData = await axios.get<CountryType[]>('https://restcountries.com/v3.1/all');
+      const allCountries = fetchedData.data;      
 
-    fetchPersons();
+      setCountries(allCountries);
+    };
+
+    fetchAllCountries();
   }, []);
 
-  const handleNameInput: ChangeEventHandler<HTMLInputElement> = (event) => {
-    setNewName(event.target.value);
-  };
-  const handleNumberInput: ChangeEventHandler<HTMLInputElement> = (event) => {
-    setNewNumber(Number(event.target.value));
-  };
-  const handleSearchInput: ChangeEventHandler<HTMLInputElement> = (event) => {
-    setSearchedName(event.target.value);
+  const handleSearchKeyword: ChangeEventHandler<HTMLInputElement> = (event) => {
+    setSearchWord(event.target.value);
   };
 
-  const handleSubmitForm: FormEventHandler = (event) => {
-    event.preventDefault();
-
-    if (persons.find(person => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
-      return;
-    }
-    setPersons(prev => [...prev, { name: newName, number: newNumber }]);
-
-    setNewName('');
-  };
-
-  const personsShown = searchedName === '' 
-    ? persons
-    : persons.filter(person => person.name?.toLowerCase() === searchedName.toLowerCase());
+  const filteredCountries = searchWord === '' 
+  ? []
+  : countries.filter(country => country.name.common.toLowerCase().match(searchWord));
 
   return (
     <div>
-      <h2>Phonebook</h2>
-      <Filter text={searchedName} onChangeHandler={handleSearchInput} />
-      <h2>add a new</h2>
-      <PersonForm 
-        newName={newName}
-        newNumber={newNumber}
-        handleNameInput={handleNameInput}
-        handleNumberInput={handleNumberInput}
-        handleSubmitForm={handleSubmitForm}
-      />
-      <h2>Numbers</h2>
-      <Persons persons={personsShown} />
+      <Search text="find countries" searchKeyword={searchWord} onChangeHandler={handleSearchKeyword} />
+      <Result filteredCountries={filteredCountries} />
     </div>
   );
-}
+};
 
 export default App
