@@ -1,6 +1,6 @@
 import React, { useState, ChangeEventHandler, FormEventHandler, useEffect } from 'react';
 
-import axios from 'axios';
+import personAPI from './api/persons';
 
 import { PersonType } from './types';
 
@@ -18,8 +18,7 @@ const App = () => {
 
   useEffect(() => {
     const fetchPersons = async () => {
-      const fetchedData = await axios.get<Partial<PersonType>[]>('http://localhost:3001/persons');
-      const fetchedPersons = fetchedData.data;
+      const fetchedPersons = await personAPI.getAll();
       setPersons(fetchedPersons);
     };  
 
@@ -36,21 +35,26 @@ const App = () => {
     setSearchedName(event.target.value);
   };
 
-  const handleSubmitForm: FormEventHandler = (event) => {
+  const handleSubmitForm: FormEventHandler = async (event) => {
     event.preventDefault();
 
     if (persons.find(person => person.name === newName)) {
       alert(`${newName} is already added to phonebook`);
       return;
     }
-    setPersons(prev => [...prev, { name: newName, number: newNumber }]);
 
-    setNewName('');
+    const newPerson = { name: newName, number: newNumber };
+    const postPerson = await personAPI.create(newPerson);
+
+    if (postPerson) {
+      setPersons(prev => [...prev, { name: newName, number: newNumber }]);
+      setNewName('');
+    }
   };
 
   const personsShown = searchedName === '' 
     ? persons
-    : persons.filter(person => person.name?.toLowerCase() === searchedName.toLowerCase());
+    : persons.filter(person => person.name?.toLowerCase().match( searchedName.toLowerCase()));
 
   return (
     <div>
