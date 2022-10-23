@@ -3,13 +3,19 @@ import React from 'react';
 import { PersonType } from '../types';
 
 interface PersonsProps {
-  persons: Partial<PersonType>[];
+  persons: PersonType[];
+  deletePersonHandler: (id: number) => void;
 }
 
-export function Persons({ persons }: PersonsProps) {
+export function Persons({ persons, deletePersonHandler }: PersonsProps) {
   return (
     <ul>
-      {persons.map(({ name, number }) => <li key={name}>{name} {number}</li>)}
+      {persons.map(({ name, number, id }) => (
+        <li key={name}>
+         {name} {number} 
+          <button onClick={() => { deletePersonHandler(id) }}>delete</button>
+        </li>
+      ))}
     </ul>
   );
 }

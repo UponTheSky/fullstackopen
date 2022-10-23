@@ -9,11 +9,9 @@ import { PersonForm } from './components/PersonFrom';
 import { Persons } from './components/Persons';
 
 const App = () => {
-  const [persons, setPersons] = useState<Partial<PersonType>[]>([
-    { name: 'Arto Hellas' }
-  ]);
+  const [persons, setPersons] = useState<PersonType[]>([]);
   const [newName, setNewName] = useState<PersonType['name']>('');
-  const [newNumber, setNewNumber] = useState<PersonType['number']>(0);
+  const [newNumber, setNewNumber] = useState<PersonType['number']>('0');
   const [searchedName, setSearchedName] = useState('');
 
   useEffect(() => {
@@ -29,11 +27,21 @@ const App = () => {
     setNewName(event.target.value);
   };
   const handleNumberInput: ChangeEventHandler<HTMLInputElement> = (event) => {
-    setNewNumber(Number(event.target.value));
+    setNewNumber(event.target.value);
   };
   const handleSearchInput: ChangeEventHandler<HTMLInputElement> = (event) => {
     setSearchedName(event.target.value);
   };
+  const deletePersonHandler = async (id: number) => {
+    const deletedPerson = persons.find(person => person.id == id);
+
+    if (deletedPerson && window.confirm(`Delete ${deletedPerson.name}?`)) {
+      const deletedData = await personAPI.delete_(id);
+      if (deletedData) {
+        setPersons(prev => prev.filter(person => person.id && (person.id !== id)));
+      }
+    }
+  }
 
   const handleSubmitForm: FormEventHandler = async (event) => {
     event.preventDefault();
@@ -47,7 +55,7 @@ const App = () => {
     const postPerson = await personAPI.create(newPerson);
 
     if (postPerson) {
-      setPersons(prev => [...prev, { name: newName, number: newNumber }]);
+      setPersons(prev => [...prev, postPerson]);
       setNewName('');
     }
   };
@@ -69,7 +77,7 @@ const App = () => {
         handleSubmitForm={handleSubmitForm}
       />
       <h2>Numbers</h2>
-      <Persons persons={personsShown} />
+      <Persons persons={personsShown} deletePersonHandler={deletePersonHandler} />
     </div>
   );
 }

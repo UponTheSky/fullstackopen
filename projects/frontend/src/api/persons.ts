@@ -19,4 +19,9 @@ const update = async (id: PersonType['id'], newObject: Partial<PersonType>) => {
   return response.data;
 };
 
-export default { getAll, create, update };
+const delete_ = async (id: PersonType['id']) => {
+  const response = await axios.delete<PersonType>(`${baseURL}/${id}`);
+  return response.data;
+}
+
+export default { getAll, create, update, delete_ };

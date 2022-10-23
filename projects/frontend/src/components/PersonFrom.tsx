@@ -2,7 +2,7 @@ import React, { ChangeEventHandler, FormEventHandler } from 'react';
 
 interface PersonFormProps {
   newName: string;
-  newNumber: number;
+  newNumber: string;
   handleNameInput: ChangeEventHandler<HTMLInputElement>;
   handleNumberInput: ChangeEventHandler<HTMLInputElement>;
   handleSubmitForm: FormEventHandler;
