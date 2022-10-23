@@ -45,17 +45,22 @@ const App = () => {
 
   const handleSubmitForm: FormEventHandler = async (event) => {
     event.preventDefault();
-
-    if (persons.find(person => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
-      return;
-    }
-
     const newPerson = { name: newName, number: newNumber };
-    const postPerson = await personAPI.create(newPerson);
+    let personResponse: PersonType;
 
-    if (postPerson) {
-      setPersons(prev => [...prev, postPerson]);
+    const personAlready = persons.find(person => person.name.toLowerCase() === newName.toLowerCase());
+    if (personAlready) {
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        personResponse = await personAPI.update(personAlready.id, newPerson);
+        personResponse && setPersons(persons.map(person => person.id !== personAlready.id ? person : personResponse));
+      }
+      setNewName('');
+      return;
+    } 
+    
+    personResponse = await personAPI.create(newPerson);
+    if (personResponse) {
+      setPersons(prev => [...prev, personResponse]);
       setNewName('');
     }
   };
@@ -82,4 +87,4 @@ const App = () => {
   );
 }
 
-export default App
+export default App;

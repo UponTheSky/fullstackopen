@@ -11,7 +11,7 @@ export function Persons({ persons, deletePersonHandler }: PersonsProps) {
   return (
     <ul>
       {persons.map(({ name, number, id }) => (
-        <li key={name}>
+        <li key={id}>
          {name} {number} 
           <button onClick={() => { deletePersonHandler(id) }}>delete</button>
         </li>
