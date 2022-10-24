@@ -1,6 +1,5 @@
-export interface NoteType {
+export interface PersonType {
   id: number;
-  content: string;
-  date: string;
-  important: boolean;
+  name: string;
+  number: string;
 }

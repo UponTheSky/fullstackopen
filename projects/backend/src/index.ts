@@ -1,82 +1,78 @@
 import express, { Request, Response } from 'express';
 
-import { NoteType } from './types';
+import { PersonType } from './types';
+import { personsData } from './hardcode_data';
 
+import { generateId } from './utils/generateId';
+
+let persons = personsData;
+
+// create an app
 const app = express();
+app.use(express.json()); // for parsing incoming request.body data
 
-app.use(express.json());
-
-let notes = [
-  {
-    id: 1,
-    content: "HTML is easy",
-    date: "2022-05-30T17:30:31.098Z",
-    important: true
-  },
-  {
-    id: 2,
-    content: "Browser can execute only Javascript",
-    date: "2022-05-30T18:39:34.091Z",
-    important: false
-  },
-  {
-    id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    date: "2022-05-30T19:20:14.298Z",
-    important: true
-  }
-];
-
-const generateId = () => {
-  const maxId = notes.length > 0
-  ? Math.max(...notes.map(n => n.id))
-  : 0;
-  
-  return maxId + 1;
-}
-
-app.get('/', (request, response: Response<string>) => {
-  response.send('<h1>Helloooo</h1>');
+// routers
+app.get('/info', (_, response) => {
+  const message = `
+    Phonebook has info for ${persons.length} people\n
+    ${String(new Date())}
+  `
+  response.send(message);
 });
 
-app.get('/api/notes', (request, response: Response<NoteType[]>) => {
-  response.json(notes);
-});
+app.get('/api/persons', (_, response: Response<PersonType[]>) => {
+  response.json(persons);
+}); 
 
-app.get('/api/notes/:id', (request, response: Response<NoteType>) => {
-  const id = request.params.id;
-  const note = notes.find(note => note.id === Number(id));
-  note 
-  ? response.json(note)
-  : response.status(404).end();
-});
-
-app.delete('/api/notes/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response: Response<PersonType>) => {
   const id = Number(request.params.id);
-  notes = notes.filter(note => note.id !== id);
 
-  response.status(204).end();
-});
-
-app.post('/api/notes/', (request: Request<{}, {}, NoteType>, response) => {
-  if (!request.body.content) {
-    return response.status(400).json({
-      error: "content missing"
-    })
+  const person = persons.find(person => person.id === id) ;
+  if (!person) {
+    response.status(404).end();
+    return;
   }
 
-  const note = {
-    content: request.body.content,
-    important: request.body.important || false,
-    date: String(new Date()),
+  response.json(person);
+});
+
+app.post('/api/persons', (request: Request<{}, {}, Omit<PersonType, 'id'>>, response: Response<Omit<PersonType, 'id'> | { error: string }>) => {
+  const body = request.body;
+
+  if (!body.name || !body.number) {
+    response.status(400).json({
+      error: 'content missing',
+    });
+    return;
+  }
+
+  const personAlready = persons.find(person => person.name == body.name);
+  if (personAlready) {
+    response.status(400).json({
+      error: 'name must be unique'
+    });
+    return;
+  }
+
+  const newPerson = {
+    name: body.name,
+    number: body.number,
     id: generateId()
-  }
-  notes = [...notes, note];
+  };
 
-  response.json(note);
+  persons = [...persons, newPerson];
+  response.json(newPerson);
 });
 
+app.delete('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id);
+  persons = persons.filter(person => person.id !== id);
+  console.log(persons);
+  response.status(204).end();
+}); 
+
+// start the app
 const PORT = 3001;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`The server running on port ${PORT}`)
 });
