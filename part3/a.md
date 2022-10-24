@@ -136,5 +136,25 @@ app.post('/api/notes/', (request: Request<{}, {}, NoteType>, response) => {
 - timestamp generated on the server side
 
 ## About HTTP request types
+- HTTP standard's recommendations:
+  - **safety**: GET/HEAD request must have no side effect on the server
+  - **idempotent**: all requests but POST must be idempotent - if a request does generate side-effects, then the result should be the same regardless of how many times the request is sent
+
+- POST is neither safe nor idempotent
 
 ## Middleware
+- middleware: a collection of functions that can be used for handling `request` and `response` objects
+- when you have more than one, those functions are executed one by one in the order that they were enrolled into the express app
+
+```js
+const exampleMiddleware = (req, res, next) => {
+  // do sth with req, res
+
+  next(); // this yields control to the next middleware
+}
+
+app.use(exampleMiddleware);
+```
+- therefore, middleware functions have to be taken into use before routes, if we want them to be executed
+before the route event handlers are called
+- middleware after the route: only called if no route handles the HTTP request
