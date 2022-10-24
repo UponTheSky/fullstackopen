@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import morgan from 'morgan';
 
 import { PersonType } from './types';
 import { personsData } from './hardcode_data';
@@ -7,9 +8,19 @@ import { generateId } from './utils/generateId';
 
 let persons = personsData;
 
-// create an app
+// create an app & middlewares
 const app = express();
 app.use(express.json()); // for parsing incoming request.body data
+app.use(morgan((tokens, req, res) => {
+  return [
+    tokens.method(req, res),
+    tokens.url(req, res),
+    tokens.status(req, res),
+    tokens.res(req, res, 'content-length'), '-', 
+    tokens['response-time'](req, res), 'ms',
+    req.method === 'POST' ? JSON.stringify(req.body) : ''
+  ].join(' ');
+}));
 
 // routers
 app.get('/info', (_, response) => {
