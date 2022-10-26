@@ -1,12 +1,12 @@
+import dotenv from 'dotenv';
+dotenv.config(); // first, run dotenv.config() for making envvars available for all modules globally
+
 import express, { Request, Response } from 'express';
 import morgan from 'morgan';
 
 import { PersonType } from './types';
-import { personsData } from './hardcode_data';
-
-import { generateId } from './utils/generateId';
-
-let persons = personsData;
+import { PersonModel, DBPersonType } from './person';
+import mongoose from 'mongoose';
 
 // create an app & middlewares
 const app = express();
@@ -23,67 +23,94 @@ app.use(morgan((tokens, req, res) => {
 }));
 
 // routers
-app.get('/info', (_, response) => {
-  const message = `
-    Phonebook has info for ${persons.length} people\n
-    ${String(new Date())}
-  `
-  response.send(message);
+app.get('/info', async (_, response) => {
+  try {
+    const persons = await PersonModel.find({});
+    const message = `
+      Phonebook has info for ${persons.length} people\n
+      ${String(new Date())}
+    `
+    response.send(message);
+
+  } catch(error) {
+    console.log(`fetching data has failed: ${error}`);
+  }
 });
 
-app.get('/api/persons', (_, response: Response<PersonType[]>) => {
-  response.json(persons);
+app.get('/api/persons', async (_, response: Response<DBPersonType[]>) => {
+  try {
+    const persons = await PersonModel.find({});
+    response.json(persons);
+  } catch(error) {
+    console.log(`fetching data has failed: ${error}`);
+  }
 }); 
 
-app.get('/api/persons/:id', (request, response: Response<PersonType>) => {
-  const id = Number(request.params.id);
+app.get('/api/persons/:id', async (request, response: Response<DBPersonType | string>) => {
+  try {
+    const id = request.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      response.status(400).send(`id: ${id} is not a valid format for _id field in the mongoDB`);
+      return;
+    }
 
-  const person = persons.find(person => person.id === id) ;
-  if (!person) {
-    response.status(404).end();
-    return;
+    const fetchedPerson = await PersonModel.findById(id);
+    if (fetchedPerson) {
+      response.json(fetchedPerson);
+    } else {
+      response.send(`could not find the data matching the id: ${id}`);
+    }
+  } catch(error) {
+    console.log(`fetching data has failed: ${error}`);
   }
-
-  response.json(person);
 });
 
-app.post('/api/persons', (request: Request<{}, {}, Omit<PersonType, 'id'>>, response: Response<Omit<PersonType, 'id'> | { error: string }>) => {
-  const body = request.body;
+app.post('/api/persons', async (
+  request: Request<{}, {}, DBPersonType>, 
+  response: Response<DBPersonType | { error: string }>) => {
+  try {
+    const body = request.body;
 
-  if (!body.name || !body.number) {
-    response.status(400).json({
-      error: 'content missing',
+    if (!body.name || !body.number) {
+      response.status(400).json({
+        error: 'content missing',
+      });
+      return;
+    }
+
+    const personAlready = await PersonModel.find({ name: body.name });
+    if (personAlready.length > 0) {
+      response.status(400).json({
+        error: 'name must be unique'
+      });
+      return;
+    }
+
+    const newPerson = new PersonModel({
+      name: body.name,
+      number: body.number,
     });
-    return;
+    const savedPerson = await newPerson.save();
+    response.json(savedPerson);
+
+  } catch(error) {
+    console.log(`fetching data has failed: ${error}`);
   }
-
-  const personAlready = persons.find(person => person.name == body.name);
-  if (personAlready) {
-    response.status(400).json({
-      error: 'name must be unique'
-    });
-    return;
-  }
-
-  const newPerson = {
-    name: body.name,
-    number: body.number,
-    id: generateId()
-  };
-
-  persons = [...persons, newPerson];
-  response.json(newPerson);
 });
 
-app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id);
-  persons = persons.filter(person => person.id !== id);
-  console.log(persons);
-  response.status(204).end();
+app.delete('/api/persons/:id', async (request, response) => {
+  try {
+    // const id = request.params.id;
+    // PersonModel.deleteOne
+    // response.status(204).end();
+
+  } catch(error) {
+    console.log(`fetching data has failed: ${error}`);
+  }
 }); 
 
 // start the app
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`The server running on port ${PORT}`)
 });

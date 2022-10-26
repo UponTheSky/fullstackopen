@@ -13,7 +13,7 @@ GET http://localhost:3001/api/persons
 GET http://localhost:3001/info 
 
 ###
-GET http://localhost:3001/api/persons/3
+GET http://localhost:3001/api/persons/6357e17030f3031c7bfd433d
 
 ###
 GET http://localhost:3001/api/persons/5
@@ -26,6 +26,6 @@ POST http://localhost:3001/api/persons
 Content-Type: application/json
 
 {
-  "name": "blink 182",
+  "name": "sum 41",
   "number": 1234567
 }
