@@ -6,3 +6,14 @@ Content-Type: application/json
   "important": true
 }
 
+###
+PUT http://localhost:3001/api/notes/6359298f36477c317369af71
+Content-Type: application/json
+
+{
+  "content": "yeahsssss~",
+  "important": true
+}
+
+###
+DELETE http://localhost:3001/api/notes/6359298f36477c317369af71

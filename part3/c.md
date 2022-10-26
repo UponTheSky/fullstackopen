@@ -105,11 +105,28 @@ automatically by the `JSON.stringify` method
 - customizing the router handlers according to the mongoose API
 
 ## Verifying frontend and backend integration
+- skim this part
 
-## Error handling 
+## Error handling
+- status 404(not found) / 500(internel server error) / 400(bad request)
+- when dealing with Promises, it is always good to have error handling logics
 
 ## Moving error handling into middleware
+- in some cases it is better to implement all error handling in a single place
+- `next` argument at the handling function: passes the error forward
+  - if `next` is called without a parameter, then the execution would simply move onto the next route or middleware
+  - otherwise, the execution will continue to the error handler middleware
+
+- express error handlers: middlewares of the form: `(error, request, response, next) => {...}`
+- it not returned, error handlers passes the error forward to the default express error handler
+- error handling middleware must be the last loaded middleware
 
 ## The order of middleware loading
+- the execution order of middleware is the same as the order that they are loaded into express with `app.use`
+- json parser must be the first to be enrolled
+- the middleware for handling unsupported routes: next to the last middleware to be enrolled
+  - no routes or middleware(except error handler) will be called after the response has been sent by unknown endpoint middleware
 
 ## Other operations
+- delete, put
+- `findByIdAndUpdate`: need to specify the option `{ new: true }` for getting the updated object
