@@ -69,12 +69,40 @@ save(url, {
 - you must close the connection: otherwise the program never ends
 
 ## Fetching objects from the database
+- using `<model>.find` method
 
 ## Backend connected to a database
+- modifying the queried data from the DB
+
+```js
+noteSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  }
+});
+
+app.get('/api/notes', async (request, response: Response<DBNoteType[]>) => {
+  if (!mongoose.STATES) {
+    console.error("not connected yet");
+    return;
+  }
+
+  const notes = await Note.find({});
+  response.json(notes);
+});
+```
+- `toJSON`: when the response is sent in the JSON format, this method of each object in the fetched array(`notes`) is called
+automatically by the `JSON.stringify` method
 
 ## Database configuration into its own module
+- refactoring into a separate module
+- config via `process.env.<ENV_VAR>` and `dotenv` library
+- be aware that you run `dotenv.config()` before importing `Note` model so that our env vars are globally available when those modules begin to run
 
 ## Using database in route handlers
+- customizing the router handlers according to the mongoose API
 
 ## Verifying frontend and backend integration
 

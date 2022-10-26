@@ -1,82 +1,72 @@
 import express, { Request, Response } from 'express';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+dotenv.config();
 
 import { NoteType } from './types';
 
-const app = express();
+import { Note, DBNoteType } from './note';
 
+const app = express();
 app.use(express.json());
 
-let notes = [
-  {
-    id: 1,
-    content: "HTML is easy",
-    date: new Date("2022-05-30T17:30:31.098Z"),
-    important: true
-  },
-  {
-    id: 2,
-    content: "Browser can execute only Javascript",
-    date: new Date("2022-05-30T18:39:34.091Z"),
-    important: false
-  },
-  {
-    id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    date: new Date("2022-05-30T19:20:14.298Z"),
-    important: true
+app.get('/api/notes', async (request, response: Response<DBNoteType[]>) => {
+  if (!mongoose.STATES) {
+    console.error("not connected yet");
+    return;
   }
-];
 
-const generateId = () => {
-  const maxId = notes.length > 0
-  ? Math.max(...notes.map(n => n.id))
-  : 0;
-  
-  return maxId + 1;
-}
-
-app.get('/', (request, response: Response<string>) => {
-  response.send('<h1>Helloooo</h1>');
-});
-
-app.get('/api/notes', (request, response: Response<NoteType[]>) => {
+  const notes = await Note.find({});
   response.json(notes);
 });
 
-app.get('/api/notes/:id', (request, response: Response<NoteType>) => {
+app.get('/api/notes/:id', async (request, response: Response<DBNoteType>) => {
   const id = request.params.id;
-  const note = notes.find(note => note.id === Number(id));
-  note 
-  ? response.json(note)
-  : response.status(404).end();
+  
+  try {
+    const note = await Note.findById(id);
+    if (note) {
+      response.json(note);
+    } else {
+      response.status(204).end();
+    }
+  } catch(error) {
+    throw Error(`fetching the item with ${id} has failed: ${error}`);
+  }
 });
 
-app.delete('/api/notes/:id', (request, response) => {
-  const id = Number(request.params.id);
-  notes = notes.filter(note => note.id !== id);
+// app.delete('/api/notes/:id', (request, response) => {
+//   const id = Number(request.params.id);
+//   notes = notes.filter(note => note.id !== id);
 
-  response.status(204).end();
-});
+//   response.status(204).end();
+// });
 
-app.post('/api/notes/', (request: Request<{}, {}, NoteType>, response) => {
-  if (!request.body.content) {
+app.post('/api/notes/', async (request: Request<{}, {}, NoteType>, response) => {
+  const body = request.body;
+  
+  if (!body.content) {
     return response.status(400).json({
       error: "content missing"
     })
   }
 
-  const note = {
-    content: request.body.content,
-    important: request.body.important || false,
+  const note = new Note({
+    content: body.content,
+    important: body.important || false,
     date: new Date(),
-    id: generateId()
-  }
-  notes = [...notes, note];
+  });
 
-  response.json(note);
+  try {
+    const savedNote = await note.save();
+    response.json(savedNote);
+  } catch(error) {
+    throw Error(`cannot save the new note: ${error}`);
+  }
 });
 
-const PORT = 3001;
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
 });

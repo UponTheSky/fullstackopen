@@ -19,7 +19,24 @@ if (process.argv.length < 3) {
     process.exit(1);
 }
 const password = process.argv[2];
-const url = `mongodb+srv://fullstack:${password}@cluster0.nipffif.mongodb.net/?retryWrites=true&w=majority`;
+const url = `mongodb+srv://fullstack:${password}@cluster0.nipffif.mongodb.net/fullstack?retryWrites=true&w=majority`;
+let notes = [
+    {
+        content: "HTML is easy",
+        date: new Date("2022-05-30T17:30:31.098Z"),
+        important: true
+    },
+    {
+        content: "Browser can execute only Javascript",
+        date: new Date("2022-05-30T18:39:34.091Z"),
+        important: false
+    },
+    {
+        content: "GET and POST are the most important methods of HTTP protocol",
+        date: new Date("2022-05-30T19:20:14.298Z"),
+        important: true
+    }
+];
 // define data schema and model
 const noteSchema = new mongoose_1.default.Schema({
     content: String,
@@ -31,6 +48,7 @@ const Note = mongoose_1.default.model('Note', noteSchema);
 const save = (url, note) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // connect to the DB
+        console.log("connecting to the DB...");
         yield mongoose_1.default.connect(url);
         console.log("connected");
         // generate a new note to be saved
@@ -45,11 +63,7 @@ const save = (url, note) => __awaiter(void 0, void 0, void 0, function* () {
         throw Error(`an error occurred: ${error}`);
     }
 });
-// save(url, {
-//   content: 'HTML is Easy',
-//   date: new Date(),
-//   important: true,
-// });
+save(url, notes[0]);
 const fetch = (url, options) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // connect to the DB
@@ -64,4 +78,4 @@ const fetch = (url, options) => __awaiter(void 0, void 0, void 0, function* () {
         throw Error(`an error occurred: ${error}`);
     }
 });
-fetch(url, {});
+// fetch(url, {});

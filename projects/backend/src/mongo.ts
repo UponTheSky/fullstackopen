@@ -9,7 +9,24 @@ if (process.argv.length < 3) {
 }
 
 const password = process.argv[2];
-const url = `mongodb+srv://fullstack:${password}@cluster0.nipffif.mongodb.net/?retryWrites=true&w=majority`;
+const url = `mongodb+srv://fullstack:${password}@cluster0.nipffif.mongodb.net/fullstack?retryWrites=true&w=majority`;
+let notes = [
+  {
+    content: "HTML is easy",
+    date: new Date("2022-05-30T17:30:31.098Z"),
+    important: true
+  },
+  {
+    content: "Browser can execute only Javascript",
+    date: new Date("2022-05-30T18:39:34.091Z"),
+    important: false
+  },
+  {
+    content: "GET and POST are the most important methods of HTTP protocol",
+    date: new Date("2022-05-30T19:20:14.298Z"),
+    important: true
+  }
+];
 
 // define data schema and model
 const noteSchema = new mongoose.Schema({
@@ -24,6 +41,7 @@ const Note = mongoose.model('Note', noteSchema);
 const save = async (url: string, note: Partial<NoteType>) => {
   try {
     // connect to the DB
+    console.log("connecting to the DB...");
     await mongoose.connect(url);
     console.log("connected");
 
@@ -40,11 +58,7 @@ const save = async (url: string, note: Partial<NoteType>) => {
   }
 };
 
-// save(url, {
-//   content: 'HTML is Easy',
-//   date: new Date(),
-//   important: true,
-// });
+save(url, notes[0]);
 
 const fetch = async (url: string, options: Partial<NoteType>) => {
   try {
@@ -62,4 +76,4 @@ const fetch = async (url: string, options: Partial<NoteType>) => {
   } 
 }  
 
-fetch(url, {});
+// fetch(url, {});
