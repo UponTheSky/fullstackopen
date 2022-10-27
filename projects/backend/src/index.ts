@@ -68,13 +68,6 @@ app.post('/api/persons', async (
   try {
     const body = request.body;
 
-    if (!body.name || !body.number) {
-      response.status(400).json({
-        error: 'content missing',
-      });
-      return;
-    }
-
     const personAlready = await PersonModel.find({ name: body.name });
     if (personAlready.length > 0) {
       response.status(400).json({
@@ -112,13 +105,6 @@ app.put('/api/persons/:id', async (request, response: Response<DBPersonType | st
     const id = request.params.id;
     const body = request.body;
 
-    if (!body.name || !body.number) {
-      response.status(400).json({
-        error: 'content missing',
-      });
-      return;
-    }
-
     const personAlready = await PersonModel.find({ name: body.name });
     if (personAlready.length === 0) {
       response.status(400).json({
@@ -133,7 +119,11 @@ app.put('/api/persons/:id', async (request, response: Response<DBPersonType | st
         name: body.name,
         number: body.number
       },
-      { new: true }
+      { 
+        new: true,
+        runValidators: true,
+        context: 'query'
+      } 
     );
     
     if (updatedPerson) {
@@ -163,6 +153,14 @@ const handleErrorMiddleware: ErrorRequestHandler = (error, request, response, ne
     });
     return;
   }
+
+  if (error.name === 'ValidationError') {
+    response.status(400).send({
+      error: error.message
+    });
+    return;
+  }
+
   next(error);
 };
 app.use(handleErrorMiddleware);

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { ValidatorProps } from 'mongoose';
 
 import { PersonType } from './types';
 
@@ -6,8 +6,16 @@ import { PersonType } from './types';
 export type DBPersonType = Omit<PersonType, 'id'>;
 
 const personSchema = new mongoose.Schema<DBPersonType>({
-  name: { type: String, required: true },
-  number: { type: String, required: true }
+  name: { 
+    type: String, 
+    minlength: 3,  
+    required: true 
+  },
+  number: { 
+    type: String, 
+    validate: /\d{2,3}-\d+/,
+    required: true
+  }
 });
 
 // define the toJSON method for data postprocessing
