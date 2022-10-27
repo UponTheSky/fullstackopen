@@ -10,7 +10,10 @@ Content-Type: application/json
 GET http://localhost:3001/api/persons
 
 ### 
-GET http://localhost:3001/info 
+GET http://localhost:3001/info
+
+###
+GET http://localhost:3001/inf
 
 ###
 GET http://localhost:3001/api/persons/6357e17030f3031c7bfd433d
@@ -26,6 +29,24 @@ POST http://localhost:3001/api/persons
 Content-Type: application/json
 
 {
-  "name": "sum 41",
+  "name": "oasis",
   "number": 1234567
+}
+
+### 
+PUT http://localhost:3001/api/persons/6359fb8c10308ee5cfd9dbcc
+Content-Type: application/json
+
+{
+  "name": "oasis",
+  "number": 777777
+}
+
+### 
+PUT http://localhost:3001/api/persons/6359fb8c10308ee5cfd9dbcc
+Content-Type: application/json
+
+{
+  "name": "sum 43",
+  "number": 777777
 }

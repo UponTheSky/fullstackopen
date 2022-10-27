@@ -1,12 +1,10 @@
 import dotenv from 'dotenv';
 dotenv.config(); // first, run dotenv.config() for making envvars available for all modules globally
 
-import express, { Request, Response } from 'express';
+import express, { ErrorRequestHandler, Request, RequestHandler, RequestParamHandler, Response } from 'express';
 import morgan from 'morgan';
 
-import { PersonType } from './types';
 import { PersonModel, DBPersonType } from './person';
-import mongoose from 'mongoose';
 
 // create an app & middlewares
 const app = express();
@@ -23,7 +21,7 @@ app.use(morgan((tokens, req, res) => {
 }));
 
 // routers
-app.get('/info', async (_, response) => {
+app.get('/info', async (_, response, next) => {
   try {
     const persons = await PersonModel.find({});
     const message = `
@@ -34,40 +32,39 @@ app.get('/info', async (_, response) => {
 
   } catch(error) {
     console.log(`fetching data has failed: ${error}`);
+    next(error);
   }
 });
 
-app.get('/api/persons', async (_, response: Response<DBPersonType[]>) => {
+app.get('/api/persons', async (_, response: Response<DBPersonType[]>, next) => {
   try {
     const persons = await PersonModel.find({});
     response.json(persons);
   } catch(error) {
     console.log(`fetching data has failed: ${error}`);
+    next(error);
   }
 }); 
 
-app.get('/api/persons/:id', async (request, response: Response<DBPersonType | string>) => {
+app.get('/api/persons/:id', async (request, response: Response<DBPersonType | string>, next) => {
   try {
     const id = request.params.id;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      response.status(400).send(`id: ${id} is not a valid format for _id field in the mongoDB`);
-      return;
-    }
-
     const fetchedPerson = await PersonModel.findById(id);
     if (fetchedPerson) {
       response.json(fetchedPerson);
     } else {
-      response.send(`could not find the data matching the id: ${id}`);
+      response.status(404).send(`could not find the data matching the id: ${id}`);
     }
   } catch(error) {
-    console.log(`fetching data has failed: ${error}`);
+    console.log(`fetching data has failed`);
+    next(error);
   }
 });
 
 app.post('/api/persons', async (
   request: Request<{}, {}, DBPersonType>, 
-  response: Response<DBPersonType | { error: string }>) => {
+  response: Response<DBPersonType | { error: string }>,
+  next) => {
   try {
     const body = request.body;
 
@@ -95,19 +92,80 @@ app.post('/api/persons', async (
 
   } catch(error) {
     console.log(`fetching data has failed: ${error}`);
+    next(error);
   }
 });
 
-app.delete('/api/persons/:id', async (request, response) => {
+app.delete('/api/persons/:id', async (request, response, next) => {
   try {
-    // const id = request.params.id;
-    // PersonModel.deleteOne
-    // response.status(204).end();
-
+    const id = request.params.id;
+    await PersonModel.findByIdAndRemove(id);
+    response.status(204).end();
   } catch(error) {
-    console.log(`fetching data has failed: ${error}`);
+    console.log('fetching data has failed');
+    next(error);
   }
 }); 
+
+app.put('/api/persons/:id', async (request, response: Response<DBPersonType | string | { error: string }>, next) => {
+  try {
+    const id = request.params.id;
+    const body = request.body;
+
+    if (!body.name || !body.number) {
+      response.status(400).json({
+        error: 'content missing',
+      });
+      return;
+    }
+
+    const personAlready = await PersonModel.find({ name: body.name });
+    if (personAlready.length === 0) {
+      response.status(400).json({
+        error: 'You can only update a value already in the DB'
+      });
+      return;
+    }
+
+    const updatedPerson = await PersonModel.findByIdAndUpdate(
+      id, 
+      {
+        name: body.name,
+        number: body.number
+      },
+      { new: true }
+    );
+    
+    if (updatedPerson) {
+      response.json(updatedPerson);
+    } else{
+      response.status(404).send(`no corresponding person with id: ${id}`);
+    }
+  } catch(error) {
+    console.log('updating data has failed');
+    next(error);
+  }
+});
+
+
+// error handling middlewares
+const handleUnknownEndpoint: RequestHandler = (request, response) => {
+  response.status(404).send({
+    error: 'unknown point'
+  });
+};
+app.use(handleUnknownEndpoint);
+
+const handleErrorMiddleware: ErrorRequestHandler = (error, request, response, next) => {
+  if (error.name === 'CastError') {
+    response.status(400).send({
+      error: 'malformatted id'
+    });
+    return;
+  }
+  next(error);
+};
+app.use(handleErrorMiddleware);
 
 // start the app
 const PORT = process.env.PORT || 3001;
