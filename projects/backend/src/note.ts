@@ -6,8 +6,15 @@ import { NoteType } from './types';
 export type DBNoteType = Omit<NoteType, 'id'>;
 
 const noteSchema = new mongoose.Schema<DBNoteType>({
-  content: String,
-  date: Date,
+  content: {
+    type: String,
+    minlength: 3,
+    required: true
+  },
+  date: {
+    type: Date,
+    required: true
+  },
   important: Boolean
 });
 
