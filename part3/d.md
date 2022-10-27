@@ -9,3 +9,6 @@
 - skim through this part
 
 ## Lint
+- **lint**?: any tool that detects or flags errors in programming languages, including stylistic errors
+- **ESLint**: static analyis tool(i.e. run before program execution)
+  - `.eslintrc.js`, `.eslintignore`
