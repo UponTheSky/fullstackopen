@@ -19,3 +19,9 @@
 
 ## Note on exports
 - skim through this part
+
+## Testing Node applications
+- automated testing
+- `jest`, `ts-jest`, `jest.config.js`, configuring eslint
+- `describe`: grouping tests into logical collections
+- 
