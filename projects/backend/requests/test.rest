@@ -32,3 +32,11 @@ Content-Type: application/json
   "author": "Dan Abramov",
   "likes": 0
 }
+
+###
+PUT http://localhost:3003/api/blog/6360015651fb32096906f9cf
+Content-Type: application/json
+
+{
+  "likes": 25
+}

@@ -17,8 +17,17 @@ blogRouter.get('/', async (request, response, next) => {
 
 blogRouter.post('/', async (request, response, next) => {
   try {
-    const { title, url, likes } = request.body;
+    let { title, url, likes } = request.body;
     const author = request.body.author || 'unknown';
+
+    if (!likes) {
+      likes = 0;
+    }
+
+    if (!title || !url) {
+      response.status(400).send('either url or title is not defined');
+      return;
+    }
 
     const existingBlog = await blogModel.find({ url });
     if (existingBlog.length > 0) {
@@ -34,4 +43,38 @@ blogRouter.post('/', async (request, response, next) => {
     logger.info("posting a new blog has failed");
     next(error);
   }
-})
+});
+
+blogRouter.put('/:id', async (request, response, next) => {
+  const id = request.params.id;
+
+  try {
+    const { likes } = request.body;
+
+    const updatedBlog = await blogModel.findByIdAndUpdate(
+      id, 
+      {likes: likes }, 
+      { new: true }
+    );
+
+    if (updatedBlog) {
+      response.json(updatedBlog);
+    } {
+      response.status(400).send(`updating not successful with ${likes}`);
+    }
+  } catch(error) {
+    next(error);
+  }
+});
+
+blogRouter.delete('/:id', async (request, response, next) => {
+  const id = request.params.id;
+
+  try {
+    await blogModel.findByIdAndRemove(id);
+    response.status(204).end();
+      
+  } catch(error) {
+    next(error);
+  }
+});
