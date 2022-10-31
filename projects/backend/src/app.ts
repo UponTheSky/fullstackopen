@@ -10,8 +10,9 @@ import * as config from './utils/config';
 // connect to the DB
 const url = config.MONGODB_URL;
 if (url) {
-  logger.info('connecting to', url);
+  logger.info('connecting to the DB');
   connectDB(url);
+  logger.info('connection has been successful');
 } else {
   logger.error('the DB url is not yet specified');
 }
