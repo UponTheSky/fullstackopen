@@ -7,7 +7,6 @@ import { initialBlogs } from './helper';
 
 const api = supertest(app);
 let validId: string;
-
 beforeEach(async () => {
   await blogModel.deleteMany({});
   const blogObjects = initialBlogs.map(blog => new blogModel(blog));
@@ -116,7 +115,6 @@ describe('testing delete requests', () => {
 });
 
 afterAll(() => {
-  mongoose.connection.close().then(() => {
-    console.log("connection closed");
-  });
+  console.log("connection closed");
+  mongoose.connection.close();
 });

@@ -1,13 +1,17 @@
 import { Router } from 'express';
 
 import { blogModel } from '../models/blog';
+import { User } from '../models/user';
 import * as logger from '../utils/logger';
 
 export const blogRouter = Router();
 
 blogRouter.get('/', async (request, response, next) => {
   try {
-    const blogs = await blogModel.find({});
+    const blogs = await blogModel
+      .find({})
+      .populate('user', { username: 1, name: 1, id: 1 });
+
     response.json(blogs);
   } catch(error) {
     logger.info("fetching data has failed");
@@ -17,7 +21,7 @@ blogRouter.get('/', async (request, response, next) => {
 
 blogRouter.post('/', async (request, response, next) => {
   try {
-    let { title, url, likes } = request.body;
+    let { title, url, likes, userId } = request.body;
     const author = request.body.author || 'unknown';
 
     if (!likes) {
@@ -25,18 +29,34 @@ blogRouter.post('/', async (request, response, next) => {
     }
 
     if (!title || !url) {
-      response.status(400).send('either url or title is not defined');
+      response.status(400).json({
+        error: 'either url or title is not defined'
+      });
       return;
     }
 
     const existingBlog = await blogModel.find({ url });
     if (existingBlog.length > 0) {
-      response.status(400).send(`a blog with url: ${url} already exists in the DB`);
+      response.status(400).json({
+        error: `a blog with url: ${url} already exists in the DB`
+      });
       return;
     }
 
-    const newBlog = new blogModel({ title, url, author, likes });
+    const user = await User.findById(userId);
+
+    if (!user) {
+      response.status(400).json({
+        error: `no such user with id ${userId}`
+      });
+      return;
+    }
+
+    const newBlog = new blogModel({ title, url, author, likes, user: user._id });
     const savedBlog = await newBlog.save();
+
+    user.blogs = [...user.blogs, savedBlog._id];
+    await user.save();
 
     response.status(201).json(savedBlog);
   } catch(error) {

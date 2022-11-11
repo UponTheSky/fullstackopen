@@ -1,4 +1,4 @@
-import { blogModel } from "../models/blog";
+import { User } from "../models/user";
 
 export const initialBlogs = [
   {
@@ -32,3 +32,8 @@ export const initialBlogs = [
     likes: 3,
   },
 ];
+
+export const usersInDb = async () => {
+  const users = await User.find({});
+  return users.map(user => user.toJSON());
+}

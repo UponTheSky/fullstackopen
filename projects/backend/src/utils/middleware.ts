@@ -34,7 +34,7 @@ export const handleErorrRequest: ErrorRequestHandler = (error, request, response
   // check if ValidationError
   if (error.name === 'ValidationError') {
     response.status(400).send({
-      error: "invalid data format as a body component"
+      error: error.message
     });
     return;
   }

@@ -6,10 +6,11 @@ POST http://localhost:3003/api/blog
 Content-Type: application/json
 
 {
-  "title": "Dan Abramov",
-  "author": "Dan Abramov",
-  "url": "https://test.com",
-  "likes": 0
+  "title": "Dan Abramov2",
+  "author": "Dan Abramov2",
+  "url": "https://test2.com",
+  "likes": 0,
+  "userId": "636e6f5650f311c79c0ceda0"
 }
 
 ###
@@ -39,4 +40,17 @@ Content-Type: application/json
 
 {
   "likes": 25
+}
+
+### 
+GET http://localhost:3003/api/users
+
+###
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+  "name": "ro",
+  "username": "roooo",
+  "password": "se"
 }

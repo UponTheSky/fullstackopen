@@ -1,17 +1,11 @@
 import { Schema, model } from 'mongoose';
 
 // define data schema
-export interface BlogType {
-  title: string;
-  author: string;
-  url: string;
-  likes: number;
-}
 
-const blogSchema = new Schema<BlogType>({
+const blogSchema = new Schema({
   title: {
     type: String,
-    minlength: 3,
+    minLength: 3,
     required: true
   },
   author: {
@@ -25,6 +19,10 @@ const blogSchema = new Schema<BlogType>({
   likes: {
     type: Number,
     required: true
+  },
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
   }
 });
 
