@@ -1,16 +1,20 @@
 import { Router, Response } from 'express';
 
 import { Note, DBNoteType } from '../models/note';
+import { User } from '../models/user';
+import { verifyToken } from '../utils/jwt';
 import * as logger from '../utils/logger';
 
 export const notesRouter = Router();
 
-notesRouter.get('/', async (request, response: Response<DBNoteType[]>) => {
-  const notes = await Note.find({});
+notesRouter.get('/', async (request, response) => {
+  const notes = await Note
+    .find({})
+    .populate('user', { username: 1, name: 1 });
   response.json(notes);
 });
 
-notesRouter.get('/:id', async (request, response: Response<DBNoteType | { error: string }>) => {
+notesRouter.get('/:id', async (request, response) => {
   const id = request.params.id;
   
   try {
@@ -38,14 +42,38 @@ notesRouter.delete('/:id', async (request, response, next) => {
 
 notesRouter.post('/', async (request, response, next) => {
   const body = request.body;
-  const note = new Note({
-    content: body.content,
-    important: body.important || false,
-    date: new Date(),
-  });
 
   try {
+    if (!process.env.SECRET) {
+      response.status(500).end();
+      return;
+    }
+
+    const decodedToken = verifyToken(request, process.env.SECRET);
+    if (!decodedToken.id) {
+      response.status(401).json({
+        error: 'token missing or invalid'
+      });
+    }
+
+    const user = await User.findById(decodedToken.id);
+
+    if (!user) {
+      response.status(400).send('no such user exists');
+      return;
+    }
+
+    const note = new Note({
+      content: body.content,
+      important: body.important || false,
+      date: new Date(),
+      user: user._id,
+    });
+
     const savedNote = await note.save();
+    user.notes = [ ...user?.notes, savedNote._id ];
+    await user.save();
+
     response.status(201).json(savedNote);
   } catch(error) {
     logger.info(`cannot save the new note`);

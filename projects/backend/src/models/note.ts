@@ -3,9 +3,8 @@ import mongoose from 'mongoose';
 import { NoteType } from '../types';
 
 // define data schema and toJSON method
-export type DBNoteType = Omit<NoteType, 'id'>;
 
-const noteSchema = new mongoose.Schema<DBNoteType>({
+const noteSchema = new mongoose.Schema({
   content: {
     type: String,
     minlength: 3,
@@ -15,7 +14,11 @@ const noteSchema = new mongoose.Schema<DBNoteType>({
     type: Date,
     required: true
   },
-  important: Boolean
+  important: Boolean,
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
 });
 
 // define toJSON for modifying fetched data
@@ -30,4 +33,6 @@ noteSchema.set('toJSON', {
 })
 
 // export the model
-export const Note = mongoose.model<DBNoteType>('Note', noteSchema);
+export const Note = mongoose.model('Note', noteSchema);
+
+export type DBNoteType = typeof noteSchema;

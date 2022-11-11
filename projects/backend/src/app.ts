@@ -2,6 +2,8 @@ import express from 'express';
 
 import { connectDB } from './models/mongo';
 import { notesRouter } from './controllers/notes';
+import { usersRouter } from './controllers/users';
+import { loginRouter } from './controllers/login';
 import * as middleware from './utils/middleware';
 
 import * as logger from './utils/logger';
@@ -21,5 +23,7 @@ if (url) {
 export const app = express();
 app.use(express.json());
 app.use('/api/notes', notesRouter); // controllers
+app.use('/api/users', usersRouter);
+app.use('/api/login', loginRouter);
 app.use(middleware.unknownEndpoint); // error handlers
 app.use(middleware.errorHandlingMiddleware);
