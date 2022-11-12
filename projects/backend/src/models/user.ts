@@ -1,6 +1,11 @@
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 
 // define schema
+export interface UserType {
+  username: string;
+  id: Types.ObjectId;
+}
+
 const userSchema = new mongoose.Schema({
   username: {
     type: String,

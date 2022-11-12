@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { blogModel } from '../models/blog';
 import { User } from '../models/user';
+import { getDecodedToken } from '../utils/jwt';
 import * as logger from '../utils/logger';
 
 export const blogRouter = Router();
@@ -21,7 +22,17 @@ blogRouter.get('/', async (request, response, next) => {
 
 blogRouter.post('/', async (request, response, next) => {
   try {
-    let { title, url, likes, userId } = request.body;
+    let { title, url, likes } = request.body;
+    const decodedToken = getDecodedToken(request);
+
+    // token validity check
+    if (!decodedToken || !(typeof decodedToken === 'object' && decodedToken.id)) {
+      response.status(401).json({
+        error: 'token missing or invalid'
+      });
+      return;
+    }
+
     const author = request.body.author || 'unknown';
 
     if (!likes) {
@@ -43,11 +54,11 @@ blogRouter.post('/', async (request, response, next) => {
       return;
     }
 
-    const user = await User.findById(userId);
+    const user = await User.findById(decodedToken.id);
 
     if (!user) {
       response.status(400).json({
-        error: `no such user with id ${userId}`
+        error: `no such user with id ${decodedToken.id}`
       });
       return;
     }
