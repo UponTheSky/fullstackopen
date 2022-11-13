@@ -1,6 +1,14 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Types } from 'mongoose';
 
 // define data schema
+
+export interface BlogType {
+  title: string;
+  author: string;
+  url: string;
+  likes: number;
+  user?: Types.ObjectId;
+}
 
 const blogSchema = new Schema({
   title: {

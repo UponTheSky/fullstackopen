@@ -13,7 +13,7 @@ export const generateToken = (user: UserType) => {
   return token;
 }
 
-const getTokenFromRequest = (request: Request) => {
+export const getTokenFromRequest = (request: Request) => {
   const authHeader = request.header('authorization');
   const bearerToken = authHeader && authHeader.replace(/^Bearer /, '');
 

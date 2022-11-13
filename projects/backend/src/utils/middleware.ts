@@ -1,5 +1,7 @@
-import { Request, RequestHandler, ErrorRequestHandler } from 'express';
+import { Request, RequestHandler, ErrorRequestHandler, NextFunction } from 'express';
 import morgan from 'morgan';
+
+import { getTokenFromRequest } from './jwt';
 
 // for logging the incoming requests and their handlings
 export const handleRouterLoggings = morgan<Request>((tokens, req, res) => {
@@ -12,6 +14,13 @@ export const handleRouterLoggings = morgan<Request>((tokens, req, res) => {
     req.method === 'POST' ? JSON.stringify(req.body) : ''
   ].join(' ');
 });
+
+// for handling tokens: not easy in TS so we omit the actual application of this middleware
+export const tokenExtractor = (request: Request & { token?: string }, response: Response, next: NextFunction) => {
+  const token = getTokenFromRequest(request);
+  request.token = token;
+  next();
+}
 
 // when you try to access an endpoint not enrolled into the controller
 // enrolled just before the error handlers middleware

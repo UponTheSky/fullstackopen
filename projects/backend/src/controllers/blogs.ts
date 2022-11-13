@@ -82,6 +82,25 @@ blogRouter.put('/:id', async (request, response, next) => {
   try {
     const { likes } = request.body;
 
+    const decodedToken = getDecodedToken(request);
+
+    // token validity check
+    if (!decodedToken || !(typeof decodedToken === 'object' && decodedToken.id)) {
+      response.status(401).json({
+        error: 'token missing or invalid'
+      });
+      return;
+    }
+
+    const blog = await blogModel.findById(id);
+
+    if (blog?.user?.toString() !== decodedToken.id.toString()) {
+      response.status(403).json({
+        error: 'not the owner of the blog'
+      });
+      return;
+    }
+
     const updatedBlog = await blogModel.findByIdAndUpdate(
       id, 
       {likes: likes }, 
@@ -102,6 +121,25 @@ blogRouter.delete('/:id', async (request, response, next) => {
   const id = request.params.id;
 
   try {
+    const decodedToken = getDecodedToken(request);
+
+    // token validity check
+    if (!decodedToken || !(typeof decodedToken === 'object' && decodedToken.id)) {
+      response.status(401).json({
+        error: 'token missing or invalid'
+      });
+      return;
+    }
+
+    const blog = await blogModel.findById(id);
+
+    if (blog?.user?.toString() !== decodedToken.id.toString()) {
+      response.status(403).json({
+        error: 'not the owner of the blog'
+      });
+      return;
+    }
+
     await blogModel.findByIdAndRemove(id);
     response.status(204).end();
       

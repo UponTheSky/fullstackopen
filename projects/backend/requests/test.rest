@@ -13,15 +13,19 @@ GET http://localhost:3003/api/blog
 ###
 POST http://localhost:3003/api/blog 
 Content-Type: application/json
-Authorization: Bearer yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjYzNmU2ZjU2NTBmMzExYzc5YzBjZWRhMCIsImlhdCI6MTY2ODI3MTM0M30.P81TQAkkBNeOF0GDTlYgj3jyKaPPCc28MqAg6cPpIyc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjYzNmU2ZjU2NTBmMzExYzc5YzBjZWRhMCIsImlhdCI6MTY2ODI3NDUzNX0.dd6Kiti4kQhqbnILQ0yzqznSNbvIHAQ7uhsueXW470k
 
 {
-  "title": "Dan Abramov6",
-  "author": "Dan Abramov6",
+  "title": "Dan Abramov3",
+  "author": "Dan Abramov3",
   "url": "https://test6.com",
   "likes": 0,
   "userId": "636e6f5650f311c79c0ceda0"
 }
+
+###
+DELETE http://localhost:3003/api/blog/636fd9724ac9da65ae508323
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjYzNmU2ZjU2NTBmMzExYzc5YzBjZWRhMCIsImlhdCI6MTY2ODI3NDUzNX0.dd6Kiti4kQhqbnILQ0yzqznSNbvIHAQ7uhsueXW470k
 
 ###
 POST http://localhost:3003/api/blog 
@@ -60,7 +64,7 @@ POST http://localhost:3003/api/users
 Content-Type: application/json
 
 {
-  "name": "ro",
-  "username": "roooo",
-  "password": "se"
+  "name": "root2",
+  "username": "root2",
+  "password": "secret"
 }
