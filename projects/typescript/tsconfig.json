@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    // type rules
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "declaration": true,
+
+    // lint rules
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "strictBindCallApply": true,
+
+    // language specific rules
+    "esModuleInterop": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+
+    // build rules
+    "rootDir": "./src",
+    "outDir": "./build",
+    "target": "es2020",
+  }
+}
