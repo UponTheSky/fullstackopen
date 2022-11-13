@@ -7,7 +7,6 @@
 
 - in dev environment: real-time compilation and auto-reloading should be useful
   - `ts-node`, `ts-node-dev`
-  - TS playground
 
 - setting things
   - `npm init`(or use yarn)
