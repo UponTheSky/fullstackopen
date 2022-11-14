@@ -2,27 +2,29 @@ import { Model, DataTypes } from 'sequelize';
 
 import { sequelize } from '../lib/db';
 
-export class Note extends Model {};
+export class User extends Model {};
 
-Note.init({
+User.init({
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
-  content: {
-    type: DataTypes.TEXT,
+  username: {
+    type: DataTypes.STRING,
+    unique: true,
     allowNull: false,
+    validate: {
+      isEmail: true
+    }
   },
-  important: {
-    type: DataTypes.BOOLEAN
-  },
-  date: {
-    type: DataTypes.DATE
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false
   }
 }, {
   sequelize,
   underscored: true,
-  timestamps: false,
-  modelName: 'note'
+  timestamps: true,
+  modelName: 'user'
 });
