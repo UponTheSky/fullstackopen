@@ -6,7 +6,9 @@ import {
   blogsRouter,
   usersRouter,
   loginRouter,
-  authorsRouter
+  authorsRouter,
+  readingListsRouter,
+  logoutRouter
 } from './routes';
 import { errorHandler } from './utils/middlewares';
 
@@ -19,6 +21,8 @@ app.use('/api/blogs', blogsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/login', loginRouter);
 app.use('/api/authors', authorsRouter);
+app.use('/api/readinglists', readingListsRouter);
+app.use('/api/logout', logoutRouter);
 app.use(errorHandler);
 
 app.listen(PORT, async () => {

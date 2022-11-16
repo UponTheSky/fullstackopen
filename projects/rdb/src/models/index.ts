@@ -1,16 +1,31 @@
+import { Session } from './session';
 import { Blog } from './blog';
-import { Note } from './note';
+// import { Membership } from './membership';
+// import { Note } from './note';
+import { ReadingList } from './readinglist';
+// import { Team } from './team';
 import { User } from './user';
 
-Blog.sync();
-
-User.hasMany(Note);
+// User.hasMany(Note);
 User.hasMany(Blog);
 Blog.belongsTo(User);
-Note.belongsTo(User);
+// Note.belongsTo(User);
 
-Note.sync({ alter: true });
-User.sync({ alter: true });
-Blog.sync({ alter: true });
+User.belongsTo(Session);
+Session.belongsTo(User);
 
-export { Blog, Note, User };
+User.belongsToMany(Blog, { through: ReadingList, as: 'blogs_listed' });
+Blog.belongsToMany(User, { through: ReadingList, as: 'users_listing' });
+// User.belongsToMany(Team, { through: Membership });
+// Team.belongsToMany(User, { through: Membership });
+
+export { 
+  Blog, 
+  // Note, 
+  User, 
+  ReadingList,
+  Session
+  // Team, 
+  // Membership,
+
+};

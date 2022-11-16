@@ -1,6 +1,24 @@
-import { Router } from 'express';
+import { Router, RequestHandler } from 'express';
+import { Includeable } from 'sequelize';
 
-import { Blog, User } from '../models';
+import { Blog, ReadingList, User } from '../models';
+import { tokenExtractor } from '../lib/jwt';
+
+const isAdmin: RequestHandler = async (request, response, next) => {
+  const decodedToken = tokenExtractor(request);
+
+  if (decodedToken) {
+    const user = await User.findByPk(decodedToken.id);
+    if (!user || !user.get('admin')) {
+      response.status(401).json({
+        error: 'operation not allowed'
+      });
+      return;
+    }
+
+    next();
+  }
+}
 
 export const usersRouter = Router();
 
@@ -26,7 +44,31 @@ usersRouter.post('/', async (request, response, next) => {
 
 usersRouter.get('/:id', async (request, response, next) => {
   try {
-    const user = await User.findByPk(request.params.id);
+    const { read } = request.query;
+
+    const readingListOption: Includeable = {
+      model: Blog,
+      as: 'blog_listed',
+      attributes: ['read', 'id'],
+      through: {
+        attributes: []
+      },
+    };
+
+    if (read) {
+      readingListOption.where = { read } 
+    };
+
+    const user = await User.findByPk(request.params.id, {
+      attributes: { exclude: [''] },
+      include: [
+        {
+          model: Blog,
+          attributes: { exclude: [''] }
+        },
+        readingListOption
+      ]
+    });
 
     if (!user) {
       const notFoundError = new Error('data not found');
@@ -40,7 +82,7 @@ usersRouter.get('/:id', async (request, response, next) => {
   }
 });
 
-usersRouter.put('/:username', async (request, response, next) => {
+usersRouter.put('/:username', isAdmin, async (request, response, next) => {
   try {
     const user = await User.findOne({
       where: {
@@ -55,6 +97,7 @@ usersRouter.put('/:username', async (request, response, next) => {
     }
 
     user.set('username', request.body.username);
+    user.set('disabled', request.body.disabled);
     const updatedUser = await user.save();
 
     response.json(updatedUser);

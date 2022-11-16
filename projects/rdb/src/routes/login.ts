@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { Router } from 'express';
 
 import { SECRET } from '../utils/config';
-import { User } from '../models';
+import { Session, User } from '../models';
 
 export const loginRouter = Router();
 
@@ -19,8 +19,28 @@ loginRouter.post('/', async (request, response, next) => {
       throw unAuthorizedError;
     }
 
+    if (user.get('disabled')) {
+      response.status(401).json({
+        error: 'account disabled, please contact admin'
+      });
+    } 
+
     const userForToken = { username: user.get('username'), id: user.get('id') };
     const token = jwt.sign(userForToken, SECRET);
+
+    let userSession = await Session.findOne({
+      where: {
+        userId: user.get('id')
+      }
+    });
+
+    if (!userSession) {
+      userSession = await Session.create({ userId: user.get('id'), token });
+    } else {
+      userSession.set('token', token);
+    }
+
+    await userSession.save();
 
     response.json({
       token, username: user.get('username'), name: user.get('name')
