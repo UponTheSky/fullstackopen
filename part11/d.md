@@ -57,6 +57,11 @@ on:
 - semantic: release SW / hash: dev SW
 - use both to make the base of them
 
+- **remark**: for ex.11.15, please do checkout first before using the tag action(needs doesn't guarantee the checkout to be remained the same)
+
 ## A note about using third party actions
+- semantic version: the code might be changed, so it might be better to depend on a commit's hash value
+- third party actions are usually buggy and even malicious
 
 ## Keep the main branch protected
+- protect your `main/master` branch with a couple of rules
