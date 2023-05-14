@@ -80,3 +80,38 @@
 1. coworking: different local machine / branch / bad code
 2. automation: production pipeline is to long(dev => test, build => deploy)
 3. different deploy environment: local(macOS) vs cloud(linux)
+
+# Review(on May 14th, 2023)
+
+## Restart from the beginning
+- Essential questions
+  1. What is product? What does it mean to the customers, developers, and other team members?
+  2. What is collaboration? Why is it important and how do you achieve it?
+
+- Answers:
+  1. Product is our goal: We want to deliever values to our customers. Not only for making money and make our ends meet, but also for creating values do we work together. Here "We" doesn't only mean the company and its members, but also the customers as well. Customers give feedback to the product, and from that the company can improve the quality of the product(or maybe stop making it).
+
+  2. Obviously a large-scale software cannot be made by a single person. We need to work together to achieve our goal: product. But how, at least in the development part? And also, what in other part, such as CMS, marketing, sales, or even HR? What about our customers?
+
+  3. So all the answers to the questions can boil down to this single question: how are we going to collaborate well, inside a SLDC?
+
+## What is CI, CD, and DevOps?
+- This is why we need DevOps
+- DevOps is a paradigm about SW development practices aiming at the collaboration: development team itself, sales, marketing, HR, etc., and the customers.
+  - CI(continuous integration, **Dev**) is a set of practices for the development team
+    - frequent merging into the main branch
+    - automation of the processes for the code quality: lint, build, test, release, and deploy
+
+  - CD(continuous delivery, **Ops**) is another set of practices, but this time it is for both the devlopement team and the other stakeholders
+    - keep the main branch deployable at all times
+
+  - but these two processes usually go together and hard to distinguish in practice
+
+- But why CI/CD?
+  - "work on my machine" problem: frequent merge makes the workflow more consistent, and testing could be done in the same environment as the one for the production as well
+    - it is basically, "lack of communication in terms of code"
+
+- Why do we need automation?
+  - to accomodate such frequent merging and code sharing
+
+- other topics: tag, documentation
